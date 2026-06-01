@@ -6,29 +6,28 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Install Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: temurin
-        java-version: 17
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 11
 
-    - name: Install Gradle
-      uses: gradle/gradle-build-action@v2
+      - name: Unzip source
+        run: unzip SmsForwarder-home-settings-github-build.zip -d ./app-source
 
-    - name: Unzip source
-      run: unzip SmsForwarder-home-settings-github-build.zip -d ./app-source
+      - name: Build APK
+        run: |
+          cd ./app-source/SmsForwarder-2.2.0
+          chmod +x ./gradlew
+          ./gradlew assembleDebug
 
-    - name: Build APK
-      run: |
-        cd ./app-source
-        ./gradlew assembleDebug
-
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: smsforwarder-apk
-        path: ./app-source/app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: smsforwarder-apk
+          path: ./app-source/SmsForwarder-2.2.0/app/build/outputs/apk/debug/app-debug.apk
