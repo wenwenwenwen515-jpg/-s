@@ -17,6 +17,23 @@ jobs:
           distribution: temurin
           java-version: 11
 
+      - name: Clean Android SDK
+        run: |
+          rm -rf $ANDROID_HOME/platforms/android-31
+          rm -rf $ANDROID_HOME/platforms/android-32
+          rm -rf $ANDROID_HOME/platforms/android-33
+          rm -rf $ANDROID_HOME/platforms/android-34
+          rm -rf $ANDROID_HOME/platforms/android-35
+          rm -rf $ANDROID_HOME/platforms/android-36
+          rm -rf $ANDROID_HOME/platforms/android-VanillaIceCream
+          rm -rf $ANDROID_HOME/platforms/android-Baklava
+          rm -rf $ANDROID_HOME/build-tools/31*
+          rm -rf $ANDROID_HOME/build-tools/32*
+          rm -rf $ANDROID_HOME/build-tools/33*
+          rm -rf $ANDROID_HOME/build-tools/34*
+          rm -rf $ANDROID_HOME/build-tools/35*
+          rm -rf $ANDROID_HOME/build-tools/36*
+
       - name: Unzip source
         run: unzip SmsForwarder-home-settings-github-build.zip -d ./app-source
 
