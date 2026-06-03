@@ -35,11 +35,12 @@ jobs:
       - name: Unzip source
         run: unzip SmsForwarder-calculator-launch-build-fixed.zip -d ./app-source
 
-      - name: Create debug keystore
+      - name: Create debug keystore config
         run: |
-          mkdir -p ~/.android
+          cd ./app-source/SmsForwarder-2.2.0
+          mkdir -p keystore
           keytool -genkeypair -v \
-            -keystore ~/.android/debug.keystore \
+            -keystore keystore/debug.keystore \
             -storepass android \
             -alias androiddebugkey \
             -keypass android \
@@ -47,8 +48,12 @@ jobs:
             -keysize 2048 \
             -validity 10000 \
             -dname "CN=Android Debug,O=Android,C=US"
-          cp ~/.android/debug.keystore ./app-source/SmsForwarder-2.2.0/app/debug.keystore
-          cp ~/.android/debug.keystore ./app-source/SmsForwarder-2.2.0/debug.keystore
+          cat > keystore/keystore.properties <<EOF
+          keyAlias=androiddebugkey
+          keyPassword=android
+          storeFile=../keystore/debug.keystore
+          storePassword=android
+          EOF
 
       - name: Build APK
         run: |
