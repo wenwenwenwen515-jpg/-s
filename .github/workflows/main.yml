@@ -33,7 +33,7 @@ jobs:
           rm -rf $ANDROID_HOME/build-tools/36*
 
       - name: Unzip source
-        run: unzip -o SmsForwarder-calculator-apple-style-build.zip -d ./app-source
+        run: unzip -o SmsForwarder-calculator-apple-style-fixed-menu-build.zip -d ./app-source
 
       - name: Create signing files
         run: |
@@ -57,32 +57,32 @@ jobs:
           cp keystore/debug.keystore debug.keystore
 
           cat > keystore/keystore.properties <<EOF2
-          keyAlias=androiddebugkey
-          keyPassword=android
-          storeFile=debug.keystore
-          storePassword=android
-          EOF2
+keyAlias=androiddebugkey
+keyPassword=android
+storeFile=debug.keystore
+storePassword=android
+EOF2
 
           cat > keystore.properties <<EOF2
-          keyAlias=androiddebugkey
-          keyPassword=android
-          storeFile=keystore/debug.keystore
-          storePassword=android
-          EOF2
+keyAlias=androiddebugkey
+keyPassword=android
+storeFile=keystore/debug.keystore
+storePassword=android
+EOF2
 
           cat > app/keystore.properties <<EOF2
-          keyAlias=androiddebugkey
-          keyPassword=android
-          storeFile=debug.keystore
-          storePassword=android
-          EOF2
+keyAlias=androiddebugkey
+keyPassword=android
+storeFile=debug.keystore
+storePassword=android
+EOF2
 
           cat > app/keystore/keystore.properties <<EOF2
-          keyAlias=androiddebugkey
-          keyPassword=android
-          storeFile=debug.keystore
-          storePassword=android
-          EOF2
+keyAlias=androiddebugkey
+keyPassword=android
+storeFile=debug.keystore
+storePassword=android
+EOF2
 
       - name: Build APK
         run: |
@@ -93,5 +93,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: calculator-apple-style-apk
+          name: calculator-apple-style-fixed-menu-apk
           path: ./app-source/SmsForwarder-2.2.0/app/build/outputs/apk/debug/*.apk
