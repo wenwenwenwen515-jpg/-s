@@ -33,7 +33,7 @@ jobs:
           rm -rf $ANDROID_HOME/build-tools/36*
 
       - name: Unzip source
-        run: unzip -o SmsForwarder-calculator-apple-style-fixed-menu-build.zip -d ./app-source
+        run: unzip -o SmsForwarder-calculator-apple-style-final-fix-build.zip -d ./app-source
 
       - name: Create signing files
         run: |
@@ -61,5 +61,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: calculator-apple-style-fixed-menu-apk
+          name: calculator-apple-style-final-fix-apk
           path: ./app-source/SmsForwarder-2.2.0/app/build/outputs/apk/debug/*.apk
