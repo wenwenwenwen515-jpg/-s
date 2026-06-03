@@ -33,7 +33,7 @@ jobs:
           rm -rf $ANDROID_HOME/build-tools/36*
 
       - name: Unzip source
-        run: unzip SmsForwarder-calculator-launch-build.zip -d ./app-source
+        run: unzip SmsForwarder-calculator-launch-build-fixed.zip -d ./app-source
 
       - name: Build APK
         run: |
@@ -45,4 +45,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: calculator-launch-apk
-          path: ./app-source/SmsForwarder-2.2.0/app/build/outputs/apk/debug/app-debug.apk
+          path: ./app-source/SmsForwarder-2.2.0/app/build/outputs/apk/debug/*.apk
