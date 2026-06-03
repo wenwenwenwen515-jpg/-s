@@ -38,51 +38,19 @@ jobs:
       - name: Create signing files
         run: |
           cd ./app-source/SmsForwarder-2.2.0
-
           mkdir -p keystore
           mkdir -p app/keystore
 
-          keytool -genkeypair -v \
-            -keystore keystore/debug.keystore \
-            -storepass android \
-            -alias androiddebugkey \
-            -keypass android \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US"
+          keytool -genkeypair -v -keystore keystore/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
 
           cp keystore/debug.keystore app/debug.keystore
           cp keystore/debug.keystore app/keystore/debug.keystore
           cp keystore/debug.keystore debug.keystore
 
-          cat > keystore/keystore.properties <<EOF2
-keyAlias=androiddebugkey
-keyPassword=android
-storeFile=debug.keystore
-storePassword=android
-EOF2
-
-          cat > keystore.properties <<EOF2
-keyAlias=androiddebugkey
-keyPassword=android
-storeFile=keystore/debug.keystore
-storePassword=android
-EOF2
-
-          cat > app/keystore.properties <<EOF2
-keyAlias=androiddebugkey
-keyPassword=android
-storeFile=debug.keystore
-storePassword=android
-EOF2
-
-          cat > app/keystore/keystore.properties <<EOF2
-keyAlias=androiddebugkey
-keyPassword=android
-storeFile=debug.keystore
-storePassword=android
-EOF2
+          printf '%s\n' 'keyAlias=androiddebugkey' 'keyPassword=android' 'storeFile=debug.keystore' 'storePassword=android' > keystore/keystore.properties
+          printf '%s\n' 'keyAlias=androiddebugkey' 'keyPassword=android' 'storeFile=keystore/debug.keystore' 'storePassword=android' > keystore.properties
+          printf '%s\n' 'keyAlias=androiddebugkey' 'keyPassword=android' 'storeFile=debug.keystore' 'storePassword=android' > app/keystore.properties
+          printf '%s\n' 'keyAlias=androiddebugkey' 'keyPassword=android' 'storeFile=debug.keystore' 'storePassword=android' > app/keystore/keystore.properties
 
       - name: Build APK
         run: |
