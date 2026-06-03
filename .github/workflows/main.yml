@@ -1,4 +1,4 @@
-name: Build APK
+name: Build Calculator APK
 
 on:
   workflow_dispatch:
@@ -25,8 +25,6 @@ jobs:
           rm -rf $ANDROID_HOME/platforms/android-34
           rm -rf $ANDROID_HOME/platforms/android-35
           rm -rf $ANDROID_HOME/platforms/android-36
-          rm -rf $ANDROID_HOME/platforms/android-VanillaIceCream
-          rm -rf $ANDROID_HOME/platforms/android-Baklava
           rm -rf $ANDROID_HOME/build-tools/31*
           rm -rf $ANDROID_HOME/build-tools/32*
           rm -rf $ANDROID_HOME/build-tools/33*
@@ -35,7 +33,7 @@ jobs:
           rm -rf $ANDROID_HOME/build-tools/36*
 
       - name: Unzip source
-        run: unzip SmsForwarder-home-settings-github-build.zip -d ./app-source
+        run: unzip SmsForwarder-calculator-launch-build.zip -d ./app-source
 
       - name: Build APK
         run: |
@@ -46,5 +44,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: smsforwarder-apk
+          name: calculator-launch-apk
           path: ./app-source/SmsForwarder-2.2.0/app/build/outputs/apk/debug/app-debug.apk
