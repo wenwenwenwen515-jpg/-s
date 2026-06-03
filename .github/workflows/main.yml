@@ -1,4 +1,4 @@
-name: Build Calculator APK
+name: Build Apple Style Calculator APK
 
 on:
   workflow_dispatch:
@@ -33,12 +33,15 @@ jobs:
           rm -rf $ANDROID_HOME/build-tools/36*
 
       - name: Unzip source
-        run: unzip SmsForwarder-calculator-launch-build-fixed.zip -d ./app-source
+        run: unzip -o SmsForwarder-calculator-apple-style-build.zip -d ./app-source
 
-      - name: Create debug keystore config
+      - name: Create signing files
         run: |
           cd ./app-source/SmsForwarder-2.2.0
+
           mkdir -p keystore
+          mkdir -p app/keystore
+
           keytool -genkeypair -v \
             -keystore keystore/debug.keystore \
             -storepass android \
@@ -48,12 +51,38 @@ jobs:
             -keysize 2048 \
             -validity 10000 \
             -dname "CN=Android Debug,O=Android,C=US"
-          cat > keystore/keystore.properties <<EOF
+
+          cp keystore/debug.keystore app/debug.keystore
+          cp keystore/debug.keystore app/keystore/debug.keystore
+          cp keystore/debug.keystore debug.keystore
+
+          cat > keystore/keystore.properties <<EOF2
           keyAlias=androiddebugkey
           keyPassword=android
-          storeFile=../keystore/debug.keystore
+          storeFile=debug.keystore
           storePassword=android
-          EOF
+          EOF2
+
+          cat > keystore.properties <<EOF2
+          keyAlias=androiddebugkey
+          keyPassword=android
+          storeFile=keystore/debug.keystore
+          storePassword=android
+          EOF2
+
+          cat > app/keystore.properties <<EOF2
+          keyAlias=androiddebugkey
+          keyPassword=android
+          storeFile=debug.keystore
+          storePassword=android
+          EOF2
+
+          cat > app/keystore/keystore.properties <<EOF2
+          keyAlias=androiddebugkey
+          keyPassword=android
+          storeFile=debug.keystore
+          storePassword=android
+          EOF2
 
       - name: Build APK
         run: |
@@ -64,5 +93,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: calculator-launch-apk
+          name: calculator-apple-style-apk
           path: ./app-source/SmsForwarder-2.2.0/app/build/outputs/apk/debug/*.apk
