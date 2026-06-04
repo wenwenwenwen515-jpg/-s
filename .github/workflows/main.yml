@@ -32,12 +32,18 @@ jobs:
       - name: Unzip source
         run: unzip -o SmsForwarder-calculator-apple-style-build.zip -d ./app-source
 
-      - name: Fix missing menu id
+      - name: Fix menu missing id & strings formatted error
         run: |
+          # 1.修复缺少to_clone/to_about/to_help菜单ID
           cd ./app-source/SmsForwarder-2.2.0/app/src/main/res/menu
           echo '<item android:id="@+id/to_clone" android:visible="false"/>' >> main_menu.xml
           echo '<item android:id="@+id/to_about" android:visible="false"/>' >> main_menu.xml
           echo '<item android:id="@+id/to_help" android:visible="false"/>' >> main_menu.xml
+
+          # 2.修复strings.xml格式化报错：WebNotifyWebParams添加formatted="false"
+          cd ../values
+          sed -i 's|<string name="WebNotifyWebParams">|<string name="WebNotifyWebParams" formatted="false">|g' strings.xml
+          sed -i 's|<string name="WebNotifyWebParams">|<string name="WebNotifyWebParams" formatted="false">|g' ../values-en/strings.xml
 
       - name: Create signing files
         run: |
