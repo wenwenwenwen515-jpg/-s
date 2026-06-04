@@ -32,6 +32,17 @@ jobs:
       - name: Unzip source
         run: unzip -o SmsForwarder-calculator-apple-style-build.zip -d ./app-source
 
+      # 关键步骤：自动在menu里添加3个隐藏id，解决R.id找不到报错
+      - name: Fix missing menu id(to_clone/to_about/to_help)
+        run: |
+          cd ./app-source/SmsForwarder-2.2.0/app/src/main/res/menu
+          # 追加三个不可见菜单项，生成对应R.id，界面不显示
+          echo '
+<item android:id="@+id/to_clone" android:visible="false"/>
+<item android:id="@+id/to_about" android:visible="false"/>
+<item android:id="@+id/to_help" android:visible="false"/>
+' >> main_menu.xml
+
       - name: Create signing files
         run: |
           cd ./app-source/SmsForwarder-2.2.0
