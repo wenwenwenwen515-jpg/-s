@@ -59,18 +59,16 @@ jobs:
           ls -la
           ls -la app
           ls -la app/src/main
-          echo "原始 app/build.gradle："
+          echo "原始 app/build.gradle 前120行："
           sed -n '1,120p' app/build.gradle
 
-      - name: Fix debug signing
+      - name: Force fix debug signing
         run: |
           cd "$PROJECT_DIR"
 
-          mkdir -p keystore
-
           keytool -genkeypair \
             -v \
-            -keystore keystore/debug.keystore \
+            -keystore app/debug.keystore \
             -storepass android \
             -alias androiddebugkey \
             -keypass android \
@@ -81,35 +79,40 @@ jobs:
 
           python3 - <<'PY'
           from pathlib import Path
+          import re
+
           p = Path("app/build.gradle")
           text = p.read_text()
-
-          old_debug = """debug {
-                  keyAlias keyProps['keyAlias']
-                  keyPassword keyProps['keyPassword']
-                  storeFile keyProps['storeFile'] ? file(keyProps['storeFile']) : null
-                  storePassword keyProps['storePassword']
-              }"""
 
           new_debug = """debug {
                   keyAlias 'androiddebugkey'
                   keyPassword 'android'
-                  storeFile file('../keystore/debug.keystore')
+                  storeFile file('debug.keystore')
                   storePassword 'android'
               }"""
 
-          if old_debug in text:
-              text = text.replace(old_debug, new_debug)
-          else:
-              text = text.replace(
-                  "debug {",
-                  "debug {\n            keyAlias 'androiddebugkey'\n            keyPassword 'android'\n            storeFile file('../keystore/debug.keystore')\n            storePassword 'android'",
-                  1
-              )
+          pattern = r"debug\s*\{\s*keyAlias\s+keyProps\['keyAlias'\]\s*keyPassword\s+keyProps\['keyPassword'\]\s*storeFile\s+keyProps\['storeFile'\]\s*\?\s*file\(keyProps\['storeFile'\]\)\s*:\s*null\s*storePassword\s+keyProps\['storePassword'\]\s*\}"
 
-          p.write_text(text)
-          print("修改后的 app/build.gradle：")
-          print(p.read_text())
+          text2, count = re.subn(pattern, new_debug, text, count=1, flags=re.S)
+
+          if count == 0:
+              print("没有匹配到旧 debug 签名块，开始备用替换")
+              text2, count2 = re.subn(
+                  r"debug\s*\{[^{}]*\}",
+                  new_debug,
+                  text,
+                  count=1,
+                  flags=re.S
+              )
+              if count2 == 0:
+                  print("替换失败：找不到 debug 签名块")
+                  print(text)
+                  raise SystemExit(1)
+
+          p.write_text(text2)
+
+          print("修改后的 app/build.gradle 前120行：")
+          print("\n".join(p.read_text().splitlines()[:120]))
           PY
 
       - name: Grant execute permission for Gradle
