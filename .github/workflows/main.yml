@@ -1,4 +1,4 @@
-name: Build Engine Mode Calculator APK
+name: Build APK
 
 on:
   workflow_dispatch:
@@ -8,8 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -17,72 +16,8 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - name: Clean Android SDK
-        run: |
-          rm -rf $ANDROID_HOME/platforms/android-31
-          rm -rf $ANDROID_HOME/platforms/android-32
-          rm -rf $ANDROID_HOME/platforms/android-33
-          rm -rf $ANDROID_HOME/platforms/android-34
-          rm -rf $ANDROID_HOME/platforms/android-35
-          rm -rf $ANDROID_HOME/platforms/android-36
-          rm -rf $ANDROID_HOME/build-tools/31*
-          rm -rf $ANDROID_HOME/build-tools/32*
-          rm -rf $ANDROID_HOME/build-tools/33*
-          rm -rf $ANDROID_HOME/build-tools/34*
-          rm -rf $ANDROID_HOME/build-tools/35*
-          rm -rf $ANDROID_HOME/build-tools/36*
-
       - name: Unzip source
-        run: unzip -o SmsForwarder-engine-mode-fullscreen-build.zip -d ./app-source
-
-      - name: Create signing files
-        run: |
-          cd ./app-source/SmsForwarder-2.2.0
-
-          mkdir -p keystore
-          mkdir -p app/keystore
-
-          keytool -genkeypair -v \
-            -keystore keystore/debug.keystore \
-            -storepass android \
-            -alias androiddebugkey \
-            -keypass android \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US"
-
-          cp keystore/debug.keystore app/debug.keystore
-          cp keystore/debug.keystore app/keystore/debug.keystore
-          cp keystore/debug.keystore debug.keystore
-
-          printf '%s\n' \
-          'keyAlias=androiddebugkey' \
-          'keyPassword=android' \
-          'storeFile=debug.keystore' \
-          'storePassword=android' \
-          > keystore/keystore.properties
-
-          printf '%s\n' \
-          'keyAlias=androiddebugkey' \
-          'keyPassword=android' \
-          'storeFile=keystore/debug.keystore' \
-          'storePassword=android' \
-          > keystore.properties
-
-          printf '%s\n' \
-          'keyAlias=androiddebugkey' \
-          'keyPassword=android' \
-          'storeFile=debug.keystore' \
-          'storePassword=android' \
-          > app/keystore.properties
-
-          printf '%s\n' \
-          'keyAlias=androiddebugkey' \
-          'keyPassword=android' \
-          'storeFile=debug.keystore' \
-          'storePassword=android' \
-          > app/keystore/keystore.properties
+        run: unzip -o 你的资源包.zip -d ./app-source
 
       - name: Build APK
         run: |
@@ -93,5 +28,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: engine-mode-calculator-apk
-          path: ./app-source/SmsForwarder-2.2.0/app/build/outputs/apk/debug/*.apk
+          name: apk
+          path: ./app-source/SmsForwarder-2.2.0/app/build/outputs/apk/debug/app-debug.apk
