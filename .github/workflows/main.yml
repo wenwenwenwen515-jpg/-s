@@ -60,6 +60,45 @@ jobs:
           ls -la app
           ls -la app/src/main
 
+      - name: Create debug keystore and patch signing
+        run: |
+          cd "$PROJECT_DIR"
+
+          keytool -genkeypair \
+            -v \
+            -keystore app/debug.keystore \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("app/build.gradle")
+          text = p.read_text()
+
+          if 'storeFile file("debug.keystore")' not in text and "storeFile file('debug.keystore')" not in text:
+              text = text.replace(
+                  "debug {",
+                  "debug {\n            storeFile file('debug.keystore')",
+                  1
+              )
+
+          if "storePassword" not in text:
+              text = text.replace(
+                  "storeFile file('debug.keystore')",
+                  "storeFile file('debug.keystore')\n            storePassword 'android'\n            keyAlias 'androiddebugkey'\n            keyPassword 'android'",
+                  1
+              )
+
+          p.write_text(text)
+          print(p.read_text())
+          PY
+
       - name: Grant execute permission for Gradle
         run: |
           cd "$PROJECT_DIR"
@@ -73,7 +112,7 @@ jobs:
           BUILD_CODE=${PIPESTATUS[0]}
 
           echo "========== 关键错误开始 =========="
-          grep -n -i -A 25 -B 10 "what went wrong\|error:\|failed\|cannot find symbol\|manifest merger failed\|compilation failed" build.log || true
+          grep -n -i -A 25 -B 10 "what went wrong\|error:\|failed\|cannot find symbol\|manifest merger failed\|compilation failed\|unsupported class file\|signingconfig\|storefile" build.log || true
           echo "========== 关键错误结束 =========="
 
           exit $BUILD_CODE
