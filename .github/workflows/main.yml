@@ -1,12 +1,9 @@
 name: Build Apple Style Calculator APK
-
 on:
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,28 +30,21 @@ jobs:
           rm -rf $ANDROID_HOME/build-tools/36*
 
       - name: Unzip source
-        run: unzip -o SmsForwarder-calculator-apple-style-final-fix-build.zip -d ./app-source
+        run: unzip -o SmsForforwarder-calculator-apple-style-final-fix-build.zip -d ./app-source
 
       - name: Create signing files
         run: |
-          cd ./app-source/SmsForwarder-2.2.0
+          cd ./app-source/SmsForforwarder-2.2.0
           mkdir -p keystore
           mkdir -p app/keystore
-
-          keytool -genkeypair -v -keystore keystore/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
-
+          keytool -genkeypair -v -keystore keystore/debug.keystore -storepass android -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
           cp keystore/debug.keystore app/debug.keystore
           cp keystore/debug.keystore app/keystore/debug.keystore
           cp keystore/debug.keystore debug.keystore
 
-          printf '%s\n' 'keyAlias=androiddebugkey' 'keyPassword=android' 'storeFile=debug.keystore' 'storePassword=android' > keystore/keystore.properties
-          printf '%s\n' 'keyAlias=androiddebugkey' 'keyPassword=android' 'storeFile=keystore/debug.keystore' 'storePassword=android' > keystore.properties
-          printf '%s\n' 'keyAlias=androiddebugkey' 'keyPassword=android' 'storeFile=debug.keystore' 'storePassword=android' > app/keystore.properties
-          printf '%s\n' 'keyAlias=androiddebugkey' 'keyPassword=android' 'storeFile=debug.keystore' 'storePassword=android' > app/keystore/keystore.properties
-
       - name: Build APK
         run: |
-          cd ./app-source/SmsForwarder-2.2.0
+          cd ./app-source/SmsForforwarder-2.2.0
           chmod +x ./gradlew
           ./gradlew assembleDebug
 
@@ -62,4 +52,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: calculator-apple-style-final-fix-apk
-          path: ./app-source/SmsForwarder-2.2.0/app/build/outputs/apk/debug/*.apk
+          path: ./app-source/SmsForforwarder-2.2.0/app/build/outputs/apk/debug/*.apk
