@@ -59,14 +59,18 @@ jobs:
           ls -la
           ls -la app
           ls -la app/src/main
+          echo "原始 app/build.gradle："
+          sed -n '1,120p' app/build.gradle
 
-      - name: Create debug keystore and patch signing
+      - name: Fix debug signing
         run: |
           cd "$PROJECT_DIR"
 
+          mkdir -p keystore
+
           keytool -genkeypair \
             -v \
-            -keystore app/debug.keystore \
+            -keystore keystore/debug.keystore \
             -storepass android \
             -alias androiddebugkey \
             -keypass android \
@@ -77,25 +81,34 @@ jobs:
 
           python3 - <<'PY'
           from pathlib import Path
-
           p = Path("app/build.gradle")
           text = p.read_text()
 
-          if 'storeFile file("debug.keystore")' not in text and "storeFile file('debug.keystore')" not in text:
+          old_debug = """debug {
+                  keyAlias keyProps['keyAlias']
+                  keyPassword keyProps['keyPassword']
+                  storeFile keyProps['storeFile'] ? file(keyProps['storeFile']) : null
+                  storePassword keyProps['storePassword']
+              }"""
+
+          new_debug = """debug {
+                  keyAlias 'androiddebugkey'
+                  keyPassword 'android'
+                  storeFile file('../keystore/debug.keystore')
+                  storePassword 'android'
+              }"""
+
+          if old_debug in text:
+              text = text.replace(old_debug, new_debug)
+          else:
               text = text.replace(
                   "debug {",
-                  "debug {\n            storeFile file('debug.keystore')",
-                  1
-              )
-
-          if "storePassword" not in text:
-              text = text.replace(
-                  "storeFile file('debug.keystore')",
-                  "storeFile file('debug.keystore')\n            storePassword 'android'\n            keyAlias 'androiddebugkey'\n            keyPassword 'android'",
+                  "debug {\n            keyAlias 'androiddebugkey'\n            keyPassword 'android'\n            storeFile file('../keystore/debug.keystore')\n            storePassword 'android'",
                   1
               )
 
           p.write_text(text)
+          print("修改后的 app/build.gradle：")
           print(p.read_text())
           PY
 
@@ -112,7 +125,7 @@ jobs:
           BUILD_CODE=${PIPESTATUS[0]}
 
           echo "========== 关键错误开始 =========="
-          grep -n -i -A 25 -B 10 "what went wrong\|error:\|failed\|cannot find symbol\|manifest merger failed\|compilation failed\|unsupported class file\|signingconfig\|storefile" build.log || true
+          grep -n -i -A 25 -B 10 "what went wrong\|error:\|failed\|cannot find symbol\|manifest merger failed\|compilation failed\|unsupported class file\|signingconfig\|storefile\|keystore" build.log || true
           echo "========== 关键错误结束 =========="
 
           exit $BUILD_CODE
