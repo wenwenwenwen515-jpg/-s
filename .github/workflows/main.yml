@@ -17,37 +17,72 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Show repository files
+        run: |
+          echo "当前仓库文件："
+          ls -la
+          echo "查找 zip 文件："
+          find . -maxdepth 2 -name "*.zip" -type f -print
+
       - name: Unzip source
         run: |
           rm -rf app-source
-          unzip -o "SmsForwarder-entry-unified-source.zip" -d app-source
-          ls -la app-source
+          mkdir -p app-source
+
+          ZIP_FILE=$(find . -maxdepth 2 -name "SmsForwarder-entry-unified-source*.zip" -type f | head -n 1)
+
+          if [ -z "$ZIP_FILE" ]; then
+            echo "没有找到 SmsForwarder-entry-unified-source*.zip"
+            echo "请确认源码包已经上传到仓库根目录"
+            find . -maxdepth 2 -name "*.zip" -type f -print
+            exit 1
+          fi
+
+          echo "找到源码包：$ZIP_FILE"
+          unzip -o "$ZIP_FILE" -d app-source
+          echo "解压后文件："
+          find app-source -maxdepth 3 -type f -o -type d
+
+      - name: Locate Gradle project
+        run: |
+          PROJECT_DIR=$(find app-source -name "gradlew" -type f -exec dirname {} \; | head -n 1)
+
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "没有找到 gradlew，说明源码包结构不对"
+            find app-source -maxdepth 4 -type f -o -type d
+            exit 1
+          fi
+
+          echo "找到项目目录：$PROJECT_DIR"
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
 
       - name: Check project files
         run: |
-          cd app-source
+          cd "$PROJECT_DIR"
+          echo "当前项目目录："
+          pwd
           ls -la
+          echo "检查 app 目录："
           ls -la app
           ls -la app/src/main
 
       - name: Grant execute permission for Gradle
         run: |
-          cd app-source
+          cd "$PROJECT_DIR"
           chmod +x gradlew
 
       - name: Build debug APK
         run: |
-          cd app-source
+          cd "$PROJECT_DIR"
           ./gradlew assembleDebug --stacktrace
 
       - name: Find APK
         run: |
-          find app-source -name "*.apk" -type f -print
+          find "$PROJECT_DIR" -name "*.apk" -type f -print
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: SmsForwarder-entry-unified-apk
           path: |
-            app-source/app/build/outputs/apk/debug/*.apk
-            app-source/**/build/outputs/apk/debug/*.apk
+            **/build/outputs/apk/debug/*.apk
