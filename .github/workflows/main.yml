@@ -30,13 +30,11 @@ jobs:
           rm -rf $ANDROID_HOME/build-tools/36*
 
       - name: Unzip source
-        run: |
-          ls -l
-          unzip -o SmsForforwarder-calculator-apple-style-final-fix-build.zip -d ./app-source
+        run: unzip -o SmsForwarder-calculator-apple-style-build.zip -d ./app-source
 
       - name: Create signing files
         run: |
-          cd ./app-source/SmsForforwarder-2.2.0
+          cd ./app-source/SmsForwarder-2.2.0
           mkdir -p keystore
           mkdir -p app/keystore
           keytool -genkeypair -v -keystore keystore/debug.keystore -storepass android -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
@@ -46,12 +44,12 @@ jobs:
 
       - name: Build APK
         run: |
-          cd ./app-source/SmsForforwarder-2.2.0
+          cd ./app-source/SmsForwarder-2.2.0
           chmod +x ./gradlew
           ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: calculator-apple-style-final-fix-apk
-          path: ./app-source/SmsForforwarder-2.2.0/app/build/outputs/apk/debug/*.apk
+          name: calculator-final-apk
+          path: ./app-source/SmsForwarder-2.2.0/app/build/outputs/apk/debug/*.apk
