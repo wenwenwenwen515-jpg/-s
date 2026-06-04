@@ -30,7 +30,9 @@ jobs:
           rm -rf $ANDROID_HOME/build-tools/36*
 
       - name: Unzip source
-        run: unzip -o SmsForforwarder-calculator-apple-style-final-fix-build.zip -d ./app-source
+        run: |
+          ls -l
+          unzip -o SmsForforwarder-calculator-apple-style-final-fix-build.zip -d ./app-source
 
       - name: Create signing files
         run: |
