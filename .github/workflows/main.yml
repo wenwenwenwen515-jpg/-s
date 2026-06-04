@@ -32,10 +32,11 @@ jobs:
       - name: Unzip source
         run: unzip -o SmsForwarder-calculator-apple-style-build.zip -d ./app-source
 
-      # 核心修复：注释掉MainActivity三个不存在ID的case分支，不用补资源、彻底规避R.id找不到报错
-      - name: Fix java code comment missing case
+      # 一次性注释4个缺失ID：to_app_list / to_clone / to_about / to_help
+      - name: Fix all missing R.id case code
         run: |
           cd ./app-source/SmsForwarder-2.2.0/app/src/main/java/com/idormy/sms/forwarder
+          sed -i 's/case R.id.to_app_list:/\/\/case R.id.to_app_list:/g' MainActivity.java
           sed -i 's/case R.id.to_clone:/\/\/case R.id.to_clone:/g' MainActivity.java
           sed -i 's/case R.id.to_about:/\/\/case R.id.to_about:/g' MainActivity.java
           sed -i 's/case R.id.to_help:/\/\/case R.id.to_help:/g' MainActivity.java
